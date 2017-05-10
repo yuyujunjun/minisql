@@ -10,20 +10,7 @@ using namespace std;
 
 
 
-int Table::get_attri_id(string attri_name) {
-	for (int i = 0; i < num_of_attribute; i++) {
-		if (attribute[i].attr_name == attri_name)return i;
-	}
-	return -1;
-}
-int Table::get_table_length() {
-	int len = 0;
-	for (int i = 0; i < num_of_attribute; ++i)
-	{
-		len += attribute[i].attr_len;
-	}
-	return len;
-}
+
 int main()
 {
 	string command;

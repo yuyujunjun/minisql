@@ -2,7 +2,7 @@
 #include<string>
 #include<iostream>
 using namespace std;
-#define HELLO "hello, user"
+#define HELLO "Welcome to your database! You can complete what you want!"
 #define ENTER "->"
 class Interpreter
 {
