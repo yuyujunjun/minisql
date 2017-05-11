@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Interpreter.h"
-#include"minisql.h"
+
 #include<vector>
-#include <string.h>
+#include<string.h>
 #include<sstream>
 using namespace std;
 //if input is wrong, we return 0, else we call the funcation from api and return 1

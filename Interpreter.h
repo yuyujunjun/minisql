@@ -1,4 +1,5 @@
 #pragma once
+#include"all.h"
 #include<string>
 #include<iostream>
 using namespace std;

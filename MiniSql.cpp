@@ -2,20 +2,22 @@
 //
 
 #include "stdafx.h"
-#include"minisql.h"
+#include"all.h"
 #include<string>
 #include<iostream>
-#include"Interpreter.h"
+
+
 using namespace std;
 
 
-
+BufferManager BM;
 
 int main()
 {
 	string command;
 	int status=-1;
 	Interpreter inter;
+
 	while (true) {
 		cout << ENTER;
 		getline(cin, command, ';');

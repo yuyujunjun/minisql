@@ -1,3 +1,4 @@
+#include"stdafx.h"
 #include "Catalog.h"
 
 
@@ -11,12 +12,12 @@ Catalog::~Catalog()
 {
 }
 
-int Catalog::GetAttributeLength(int type)
+int GetAttributeLength(int type,int typelength)
 {
 	return 0;
 }
 
-int Catalog::GetRecordLength(string tablename)
+int GetRecordLength(string tablename)
 {
 	return 0;
 }

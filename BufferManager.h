@@ -1,9 +1,8 @@
 #pragma once
 
-#ifndef _BuferManager_H_
-#define _BuferManager_H_
-#include "minisql.h"
-
+//#ifndef _BuferManager_H_
+//#define _BuferManager_H_
+#include "all.h"
 #define BlockSize 1024*4
 #define MaxBlock 8
 #define BlockHeadSize 64
@@ -15,7 +14,7 @@ public:
 	BufferManager();
 	~BufferManager();
 	void InitalBlock(); //初始化块结构
-	Block* GetBlock(string FileName,int Offset);  //获得一个块
+	Block* GetBlock(string FileName,int Offset=0);  //获得一个块
 	void SetPin(Block* BlockNode);  //上锁
 	void WriteToDisk(string FileName,Block* BlockNode);  //写到磁盘
 	Block* ReadToBlock(string FileName, int OffSet);  //读到缓冲区
@@ -25,4 +24,4 @@ public:
 };
 
 
-#endif
+//#endif
