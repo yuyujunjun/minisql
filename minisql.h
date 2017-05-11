@@ -2,7 +2,7 @@
 #include<string>
 using namespace std;
 
-BufferManager BM;
+
 
 //声明类型和约束
 const enum type{CHAR, INT, FLOAT};

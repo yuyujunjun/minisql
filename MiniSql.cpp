@@ -8,10 +8,10 @@
 #include"Interpreter.h"
 #include"BufferManager.h"
 using namespace std;
+BufferManager BM;
 
-
-/*interpreter检查程序
-int Table::get_attri_id(string attri_name) {
+//interpreter检查程序
+/*int Table::get_attri_id(string attri_name) {
 	for (int i = 0; i < num_of_attribute; i++) {
 		if (attribute[i].attr_name == attri_name)return i;
 	}
@@ -24,7 +24,7 @@ int Table::get_table_length() {
 		len += attribute[i].attr_len;
 	}
 	return len;
-}
+}*/
 
 int main()
 {
@@ -40,12 +40,12 @@ int main()
 	}
 	return 0;
 }
-*/
 
 
-void main()
+
+/*void main()
 {
 	BufferManager Buffer;
 	Buffer.InitalBlock();
-}
+}*/
 

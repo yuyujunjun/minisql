@@ -1,7 +1,10 @@
 #pragma once
+
+
+
 #include <string>
-#include "minisql.h"
 #include "BufferManager.h"
+#include "minisql.h"
 using namespace std;
 
 class Catalog

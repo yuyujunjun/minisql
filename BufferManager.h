@@ -2,8 +2,8 @@
 
 #ifndef _BuferManager_H_
 #define _BuferManager_H_
-#include "minisql.h"
 
+#include "minisql.h"
 #define BlockSize 1024*4
 #define MaxBlock 8
 #define BlockHeadSize 64
