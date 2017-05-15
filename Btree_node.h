@@ -38,7 +38,7 @@ template<class T> Btree_node<T>::Btree_node(string filename)
 	parent = NULL;
 	isleaf = 0;
 	isroot = 0;
-	min = 0;
+	//min = 0;
 	child[0] = NULL;
 	lastsilbling = NULL;
 	//	float_min = 0;
