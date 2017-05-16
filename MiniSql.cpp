@@ -8,7 +8,7 @@
 using namespace std;
 BufferManager BM;
 
-/*
+//*
 int main()
 {
 	string command;
@@ -24,7 +24,7 @@ int main()
 	}
 	return 0;
 }
-*/
+//*/
 
 /* WriteToMemory‘ı√¥”√?
 void main()
