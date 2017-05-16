@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "Interpreter.h"
-#include"minisql.h"
 #include<vector>
-#include <string.h>
+#include<string>
 #include<sstream>
 using namespace std;
+//if input is wrong, we return 0, else we call the funcation from api and return 1
+
 int op_for_sure(string word,int &op) {
 	if (strcmp(word.c_str(), "<") == 0)op = LESS;
 	else if (strcmp(word.c_str(), ">") == 0)op = MORE;
@@ -112,7 +113,7 @@ int Interpreter::interpreter(string command) {
 					if (strcmp(word.c_str(), ",") != 0)
 					{
 						if (strcmp(word.c_str(), ")") != 0) {
-							cout << "Syntax Error for ,!" << endl;
+							cout << "Syntax Error for ',' !" << endl;
 							return 0;
 						}
 						else
@@ -277,25 +278,6 @@ int Interpreter::interpreter(string command) {
 				return 1;
 			}
 		}
-		else if (strcmp(word.c_str(), "drop") == 0)
-		{
-			word = get_word(command, index);
-			if (strcmp(word.c_str(), "table") == 0) {
-				word = get_word(command, index);
-				if (!word.empty()) {
-					//调用api的drop table
-					return 1;
-				}
-				else { cout << "Syntax Error!" << endl; return 0; }
-			}
-			else if (strcmp(word.c_str(), "index") == 0) {
-				word = get_word(command, index);
-				if (!word.empty()) {
-					//调用drop index
-					return 1;
-				}else { cout << "Syntax Error!" << endl; return 0; }
-			}else { cout << "Syntax Error!" << endl; return 0; }
-		}
 		else if (strcmp(word.c_str(), "delete") == 0)
 		{
 			string table_name = "";
@@ -336,30 +318,28 @@ int Interpreter::interpreter(string command) {
 			}
 			
 		}
-		else if (strcmp(word.c_str(), "insert") == 0)
+		else if (strcmp(word.c_str(), "drop") == 0)
 		{
-			string table_name = "";
-			vector<string> value_array;
 			word = get_word(command, index);
-			if(strcmp(word.c_str(), "into") != 0) { cout << "Syntax Error!" << endl; return 0; }
-			word = get_word(command, index);
-			if (!word.empty())table_name = word;
-			else { cout << "Syntax Error!" << endl; return 0; }
-			word = get_word(command, index);
-			if(strcmp(word.c_str(),"values")!=0) { cout << "Syntax Error!" << endl; return 0; }
-			word = get_word(command, index);
-			if(strcmp(word.c_str(),"(")!=0) { cout << "Syntax Error!" << endl; return 0; }
-			word = get_word(command, index);
-			while (!word.empty() && strcmp(word.c_str(), ")") != 0)
-			{
-				string values = word;
-				if(strcmp(values.c_str(),",")!=0)value_array.push_back(values);
+			if (strcmp(word.c_str(), "table") == 0) {
 				word = get_word(command, index);
-
+				if (!word.empty()) {
+					//调用api的drop table
+					cout << "you just called the drop table:" << word << endl;
+					return 1;
+				}
+				else { cout << "Syntax Error!" << endl; return 0; }
 			}
-			if(strcmp(word.c_str(),")")!=0) { cout << "Syntax Error!" << endl; return 0; }
-			//调用插入values
-			return 1;
+			else if (strcmp(word.c_str(), "index") == 0) {
+				word = get_word(command, index);
+				if (!word.empty()) {
+					//调用drop index
+					cout << "you just called the drop index: " << word << endl;
+					return 1;
+				}
+				else { cout << "Syntax Error!" << endl; return 0; }
+			}
+			else { cout << "Syntax Error!" << endl; return 0; }
 		}
 		else if (strcmp(word.c_str(), "quit") == 0)return quit;
 		else if (strcmp(word.c_str(), "commit") == 0)return 1;
