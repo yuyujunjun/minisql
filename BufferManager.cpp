@@ -1,9 +1,5 @@
 #include "stdafx.h"
 #include "BufferManager.h"
-#include <iostream>
-#include <sstream>
-#include <fstream>
-using namespace std;
 
 BufferManager::BufferManager()
 {
@@ -330,18 +326,42 @@ void BufferManager::SetHead(Block* Temp)
 }
 
 
-void BufferManager::WriteToMemory(Block* t,char * s, int length)
+void BufferManager::WriteToMemory(Block* t,char * s, int length,int recordnumber)
 {
-	if (!IsFull(t, length) && IsLast(t))
+	if (0 == recordnumber)
 	{
-		memcpy(t->memory + t->Size, s, length);
-		t->Size += length;
-		t->RecordLength = length;
-		t->IsWritten = true;
-		SetHead(t);
+		if (!IsFull(t, length) && IsLast(t))
+		{
+			memcpy(t->memory + t->Size, s, length);
+			t->Size += length;
+			t->RecordLength = length;
+			t->IsWritten = true;
+			SetHead(t);
+		}
+		else
+			cout << "the block can not be wrote" << endl;
 	}
 	else
-		cout << "the block can not be wrote" << endl;
+	{
+		if ((recordnumber*length + BlockHeadSize) <= t->Size)
+		{
+			memcpy(t->memory + (recordnumber - 1)*length + BlockHeadSize, s, length);
+			t->RecordLength = length;
+			t->IsWritten = true;
+			SetHead(t);
+		}
+		else
+			cout << "the block is too small" << endl;
+	}
+}
+
+char* BufferManager::GetRecordByNum(Block * t, int recordnumber,int length)
+{
+	char* s;
+	s = new char[length + 1];
+	s[length] = 0;
+	memcpy(s,t->memory+BlockHeadSize+(recordnumber-1)*length,length);
+	return s;
 }
 
 bool BufferManager::IsFull(Block * t,int length)
@@ -371,5 +391,10 @@ bool BufferManager::IsLeaf(Block * temp)
 		return true;
 	else
 		return false;
+}
+
+int BufferManager::GetRecordNum(Block * temp, int length)
+{
+	return (temp->Size-BlockHeadSize) / length;
 }
 

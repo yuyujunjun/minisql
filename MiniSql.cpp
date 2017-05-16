@@ -8,7 +8,7 @@
 using namespace std;
 BufferManager BM;
 
-//*
+/*
 int main()
 {
 	string command;
@@ -24,7 +24,7 @@ int main()
 	}
 	return 0;
 }
-//*/
+*/
 
 /* WriteToMemory‘ı√¥”√?
 void main()
@@ -122,3 +122,46 @@ void main()
 	BM.GetBlock("im4.txt");
 }
 */
+
+
+/*void main()
+{
+	Block* B;
+	string s;
+	B = BM.GetBlock("2.txt", 2);
+	BM.WriteToMemory(B, "c", 1);
+	BM.WriteToMemory(B, "c", 1, 2);
+	s = BM.GetRecordByNum(B, 2, 1);
+	getchar();
+}*/
+
+/*
+void main()
+{
+	Block* B;
+	string s;
+	int n = BM.BlockNum("test.txt");
+	int m;
+	for (int i = 1; i <= n; i++)
+	{
+		B = BM.GetBlock("test.txt", i);
+		BM.SetHead(B);
+		BM.WriteToDisk("test.txt",B);
+	}
+	B = BM.GetBlock("test.txt", 4);
+	m = BM.GetRecordNum(B,30);
+	s = BM.GetRecordByNum(B, 5,30);
+	cout << "blocknum = " << n << "recordnum = " << m << endl;
+	cout << s << endl;
+	getchar();
+}
+*/
+
+void main()
+{
+	Block* B;
+	B = BM.GetBlock("test.txt",7);
+	BM.WriteToMemory(B,"         9CDBFJFLIN1.111111111",30);
+	BM.WriteToMemory(B, "         9CDBFJFLIN1.111111111", 30,15);
+	BM.WriteToDisk("test.txt", B);
+}

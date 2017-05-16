@@ -1,18 +1,6 @@
 #include"stdafx.h"
 #include "Catalog.h"
 
-
-
-Catalog::Catalog()
-{
-}
-
-
-Catalog::~Catalog()
-{
-}
-
-
 int GetAttributeLength(int type , int typelength)
 {
 	if (type = INT)
