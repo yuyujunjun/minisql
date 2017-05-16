@@ -12,8 +12,10 @@ Catalog::~Catalog()
 {
 }
 
-int GetAttributeLength(int type,int typelength)
+
+int GetAttributeLength(int type , int typelength)
 {
+
 	if (type = INT)
 	{
 		return 10;
@@ -27,6 +29,7 @@ int GetAttributeLength(int type,int typelength)
 		return typelength;
 	}
 	return 0;
+
 }
 
 int GetRecordLength(string tablename)

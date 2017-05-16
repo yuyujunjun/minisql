@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "Interpreter.h"
-
 #include<vector>
-#include<string.h>
+#include<string>
 #include<sstream>
 using namespace std;
 //if input is wrong, we return 0, else we call the funcation from api and return 1
+
 int op_for_sure(string word,int &op) {
 	if (strcmp(word.c_str(), "<") == 0)op = LESS;
 	else if (strcmp(word.c_str(), ">") == 0)op = MORE;
@@ -207,35 +207,6 @@ int Interpreter::interpreter(string command) {
 				return 1;
 			}
 		}
-				else if (strcmp(word.c_str(), "insert") == 0)
-				{
-					string table_name = "";
-					vector<string> value_array;
-					word = get_word(command, index);
-					if (strcmp(word.c_str(), "into") != 0) { cout << "Syntax Error!" << endl; return 0; }
-					word = get_word(command, index);
-					if (!word.empty())table_name = word;
-					else { cout << "Syntax Error!" << endl; return 0; }
-					word = get_word(command, index);
-					if (strcmp(word.c_str(), "values") != 0) { cout << "Syntax Error!" << endl; return 0; }
-					word = get_word(command, index);
-					if (strcmp(word.c_str(), "(") != 0) { cout << "Syntax Error!" << endl; return 0; }
-					word = get_word(command, index);
-					while (!word.empty() && strcmp(word.c_str(), ")") != 0)
-					{
-						string values = word;
-						if (strcmp(values.c_str(), ",") != 0)value_array.push_back(values);
-						word = get_word(command, index);
-
-					}
-					if (strcmp(word.c_str(), ")") != 0) { cout << "Syntax Error!" << endl; return 0; }
-					cout << "you insert values into " << table_name << " the values are:" << endl;
-					for (int i = 0; i < value_array.size(); i++) {
-						cout << value_array[i] << endl;
-					}
-					//µ÷ÓÃ²åÈëvalues
-					return 1;
-				}
 		else if (strcmp(word.c_str(), "select") == 0) {
 			word = get_word(command, index);
 			vector<string> attr_name;
@@ -307,7 +278,6 @@ int Interpreter::interpreter(string command) {
 				return 1;
 			}
 		}
-	
 		else if (strcmp(word.c_str(), "delete") == 0)
 		{
 			string table_name = "";
@@ -371,7 +341,6 @@ int Interpreter::interpreter(string command) {
 			}
 			else { cout << "Syntax Error!" << endl; return 0; }
 		}
-
 		else if (strcmp(word.c_str(), "quit") == 0)return quit;
 		else if (strcmp(word.c_str(), "commit") == 0)return 1;
 		else if (strcmp(word.c_str(), "execfile") == 0) {
