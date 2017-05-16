@@ -14,6 +14,18 @@ Catalog::~Catalog()
 
 int GetAttributeLength(int type,int typelength)
 {
+	if (type = INT)
+	{
+		return 10;
+	}
+	else if (type = FLOAT)
+	{
+		return 11;
+	}
+	else
+	{
+		return typelength;
+	}
 	return 0;
 }
 

@@ -2,9 +2,6 @@
 #include"all.h"
 #include<string>
 
-#include<algorithm>
-#include<vector>
-
 using namespace std;
 
 //声明类型和约束

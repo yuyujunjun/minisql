@@ -1,6 +1,5 @@
 #pragma once
 #include"all.h"
-#include<string>
 #include<iostream>
 using namespace std;
 #define HELLO "Welcome to your database! You can complete what you want!"
