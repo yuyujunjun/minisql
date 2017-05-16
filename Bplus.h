@@ -92,7 +92,7 @@ template <class T> Bplus<T>::~Bplus()
 }
 template <class T> void Bplus<T>::split(Btree_node<T> *node) {
 	Btree_node<T> * newnode = new Btree_node<T>(indexname);
-	string mid_key = node->attr[degree / 2];
+	T mid_key = node->attr[degree / 2];
 	newnode->keynum = degree - degree / 2 - 1;
 	for (int i = 0; i < newnode->keynum; i++) {
 		newnode->attr[i] = node->attr[i + (degree / 2 + 1)];

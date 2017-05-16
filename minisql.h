@@ -27,14 +27,26 @@ public:
 		NOTNULL = notnull;
 		UNIQUE = unique;
 	}
+	Attribute() {
+	}
 };
 //声明表的结构
 class Table {
 public:
+	
 	Attribute attribute[32];
 	string table_name;
 	int num_of_attribute;
 	int primary_position;
+	Table(string table_name, int num_of_attribute, int primary_position, Attribute tmp[]) {
+		this->table_name = table_name;
+		this->num_of_attribute = num_of_attribute;
+		this->primary_position = primary_position;
+		for (int i = 0; i < num_of_attribute; i++) {
+			attribute[i] = tmp[i];
+		}
+		
+	}
 };
 
 class Condition {

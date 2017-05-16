@@ -4,16 +4,16 @@
 #include"all.h"
 #include<string>
 #include<iostream>
-
+#include<vector>
 using namespace std;
-
-Btree_node<string> *queue[100];
+BufferManager BM;
+Btree_node<int> *queue[100];
 int index=0;
 int front = 0;
 
 void Print() {
 	while (front!=index) {
-		Btree_node<string>* temp = queue[front];
+		Btree_node<int>* temp = queue[front];
 		front++;
 		if (!temp->isleaf) {
 			//cout << "next :" << endl;
@@ -33,7 +33,7 @@ void Print() {
 }
 void Print1() {
 	while (front != index) {
-		Btree_node<string> * temp = queue[front];
+		Btree_node<int> * temp = queue[front];
 		front++;
 		if (!temp->isleaf) {
 			//cout << "next :" << endl;
@@ -56,7 +56,7 @@ void Print1() {
 
 
 
-BufferManager BM;
+
 
 
 //*
@@ -66,8 +66,8 @@ int main()
 	int status=-1;
 	Interpreter inter;
 	string a = "id";
-	Bplus<string> bp(a,1,4);
-	//queue[index++] = bp.root;
+	Bplus<int> bp(a, 1, 4);
+	/*//queue[index++] = bp.root;
 	bp.insert_into_btree("9",20);
 	//Print();
 	//queue[index++] = bp.root;
@@ -170,7 +170,24 @@ int main()
 
 	Print();
 	queue[index++] = bp.root;
-	Print1();
+	Print1();*/
+	Attribute aa("a",INT,true,true,4);
+	Attribute b("b", CHAR, true, true, 9);
+	Attribute c("c", FLOAT, true, true, 4);
+	Attribute attr[3];
+	//attr.push_back(a);
+
+		attr[0] = aa;
+		attr[1] = b;
+		attr[2] = c;
+	Table table("a",3,0,attr);
+	for (int i = 0; i < table.num_of_attribute; i++) {
+		cout<<table.attribute[i].attr_name<<endl;
+	}
+	index_create_index(table,aa,1,&bp);
+	queue[index++] = bp.root;
+	Print1(); 
+	//create_index();
 	//bp.Print_leaf();
 /*	b\
 	while (true) {
@@ -180,7 +197,7 @@ int main()
 		if (status == quit)break;
 		
 	}**/
-	cout << bp.query_on_btree("18")<<" "<<bp.query_on_btree("11");
+	//cout << bp.query_on_btree("18")<<" "<<bp.query_on_btree("11");
 	return 0;
 }
 //*/
