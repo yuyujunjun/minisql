@@ -1,6 +1,11 @@
 #include"stdafx.h"
 #include"index.h"
 extern BufferManager BM;
+
+//需要修改的地方： iiindex_filename:储存index信息的文件
+//rrrecord_filename储存记录的地方
+//每条记录的长度
+/*
 void save_index(Bplus<string>* btree, Attribute attribute) {
 	int front, behind;
 	front = behind = 0;
@@ -12,7 +17,7 @@ void save_index(Bplus<string>* btree, Attribute attribute) {
 		Btree_node<string> * temp = queue[front];
 		front++;
 		int offset;
-		//cout << "next :" << endl;
+		////cout << "next :" << endl;
 		if (!temp->isleaf) {
 			for (int i = 0; i <= temp->keynum; i++) {
 				queue[behind++] = temp->child[i];
@@ -24,9 +29,9 @@ void save_index(Bplus<string>* btree, Attribute attribute) {
 		else {
 			offset = 1;
 		}
-		Block* tmp_block = BM.GetBlock("index_name");
+		Block* tmp_block = BM.GetBlock(iiindex_filename);
 		for (int i = 0; i < temp->keynum; i++) {
-			//cout << temp->attr[i] << " ";
+			////cout << temp->attr[i] << " ";
 			char *s;
 			s = new char[maxlength];
 			memset(s, 0, maxlength);
@@ -50,18 +55,18 @@ void save_index(Bplus<string>* btree, Attribute attribute) {
 				for (k; k < attribute.attr_len - len + 10; k++) {
 					s[k] = ' ';
 
-					cout << "s:" << s[k];
+					////cout << "s:" << s[k];
 				}
 				for (k; k < attribute.attr_len + 10; k++) {
 					s[k] = tmp[ir++];
-					cout << "s:" << s[k];
+					////cout << "s:" << s[k];
 				}
 				s[k] = 0;
-				/*sprintf_s(s + 10, sizeof(space)+ 1, "%s", space);
-				sprintf_s(s + 10+sizeof(space), sizeof(tmp)+ 1, "%s", temp->attr[i]);*/
+				//sprintf_s(s + 10, sizeof(space)+ 1, "%s", space);
+				//sprintf_s(s + 10+sizeof(space), sizeof(tmp)+ 1, "%s", temp->attr[i]);
 			}
 			BM.WriteToMemory(tmp_block, s, length);
-			BM.WriteToDisk("index_name", tmp_block);
+			BM.WriteToDisk(iiindex_filename, tmp_block);
 			//memset(s, 0, 20);
 		}
 	}
@@ -90,7 +95,7 @@ void save_index(Bplus<int>* btree, Attribute attribute) {
 		else {
 			offset = 1;
 		}
-		Block* tmp_block = BM.GetBlock("index_name");
+		Block* tmp_block = BM.GetBlock(iiindex_filename);
 		for (int i = 0; i < temp->keynum; i++) {
 			//cout << temp->attr[i] << " ";
 			char *s;
@@ -106,7 +111,7 @@ void save_index(Bplus<int>* btree, Attribute attribute) {
 			}
 
 			BM.WriteToMemory(tmp_block, s, length);
-			BM.WriteToDisk("index_name", tmp_block);
+			BM.WriteToDisk(iiindex_filename, tmp_block);
 			//memset(s, 0, 20);
 		}
 	}
@@ -135,9 +140,9 @@ void save_index(Bplus<float>* btree, Attribute attribute) {
 		else {
 			offset = 1;
 		}
-		Block* tmp_block = BM.GetBlock("index_name");
+		Block* tmp_block = BM.GetBlock(iiindex_filename);
 		for (int i = 0; i < temp->keynum; i++) {
-			//cout << temp->attr[i] << " ";
+			////cout << temp->attr[i] << " ";
 			char *s;
 			s = new char[maxlength];
 			memset(s, 0, maxlength);
@@ -150,11 +155,147 @@ void save_index(Bplus<float>* btree, Attribute attribute) {
 			}
 
 			BM.WriteToMemory(tmp_block, s, length);
-			BM.WriteToDisk("index_name", tmp_block);
+			BM.WriteToDisk(iiindex_filename, tmp_block);
 			//memset(s, 0, 20);
 		}
 	}
 
+}*/
+
+
+void saveindex(Btree_node<int>* root, Attribute attribute) {
+	int length = GetAttributeLength(INT, 4);
+	length += GetAttributeLength(attribute.attr_type, attribute.attr_len);//index文件中每条记录的长度
+	if (root->isleaf) {
+		Block* tmp_block = BM.GetBlock(iiindex_filename);
+		for (int i = 0; i < root->keynum; i++) {
+			////cout << temp->attr[i] << " ";
+			char *s;
+			s = new char[maxlength];
+			memset(s, 0, maxlength);
+			int convert;
+			sprintf_s(s, GetAttributeLength(INT) + 1, "%-10d", root->blocknum[i]);
+			sprintf_s(s + 10, GetAttributeLength(INT) + 1, "%-10d", root->attr[i]);
+			BM.WriteToMemory(tmp_block, s, length);
+			BM.WriteToDisk(iiindex_filename, tmp_block);
+			delete[]s;
+		}
+	}else {
+		Block* tmp_block = BM.GetBlock(iiindex_filename);
+		for (int i = 0; i < root->keynum; i++) {
+			////cout << temp->attr[i] << " ";
+			char *s;
+			s = new char[maxlength];
+			memset(s, 0, maxlength);
+			int convert;
+			sprintf_s(s, GetAttributeLength(INT) + 1, "%-10d", -1);
+			sprintf_s(s + 10, GetAttributeLength(INT) + 1, "%-10d", root->attr[i]);
+			BM.WriteToMemory(tmp_block, s, length);
+			BM.WriteToDisk(iiindex_filename, tmp_block);
+			delete[]s;	
+		}
+		for (int i = 0; i <= root->keynum; i++) {
+			saveindex(root->child[i], attribute);
+		}
+	}
+}
+void saveindex(Btree_node<float>* root, Attribute attribute) {
+	int length = GetAttributeLength(INT, 4);
+	length += GetAttributeLength(attribute.attr_type, attribute.attr_len);//index文件中每条记录的长度
+	if (root->isleaf) {
+		Block* tmp_block = BM.GetBlock(iiindex_filename);
+		for (int i = 0; i < root->keynum; i++) {
+			////cout << temp->attr[i] << " ";
+			char *s;
+			s = new char[maxlength];
+			memset(s, 0, maxlength);
+			int convert;
+			sprintf_s(s, GetAttributeLength(INT) + 1, "%-10d", root->blocknum[i]);
+			sprintf_s(s + 10, GetAttributeLength(FLOAT) + 1, "%-11f", root->attr[i]);
+			BM.WriteToMemory(tmp_block, s, length);
+			BM.WriteToDisk(iiindex_filename, tmp_block);
+			delete[]s;
+		}
+	}
+	else {
+		Block* tmp_block = BM.GetBlock(iiindex_filename);
+		for (int i = 0; i < root->keynum; i++) {
+			////cout << temp->attr[i] << " ";
+			char *s;
+			s = new char[maxlength];
+			memset(s, 0, maxlength);
+			int convert;
+			sprintf_s(s, GetAttributeLength(INT) + 1, "%-10d", -1);
+			sprintf_s(s + 10, GetAttributeLength(FLOAT) + 1, "%-11f", root->attr[i]);
+			BM.WriteToMemory(tmp_block, s, length);
+			BM.WriteToDisk(iiindex_filename, tmp_block);
+			delete[]s;
+		}
+		for (int i = 0; i <= root->keynum; i++) {
+			saveindex(root->child[i], attribute);
+		}
+	}
+}
+void saveindex(Btree_node<string>* root, Attribute attribute) {
+	int length = GetAttributeLength(INT, 4);
+	length += GetAttributeLength(attribute.attr_type, attribute.attr_len);//index文件中每条记录的长度
+	if (root->isleaf) {
+		Block* tmp_block = BM.GetBlock(iiindex_filename);
+		for (int i = 0; i < root->keynum; i++) {
+			////cout << temp->attr[i] << " ";
+			char *s;
+			s = new char[maxlength];
+			memset(s, 0, maxlength);
+			int convert;
+			sprintf_s(s, GetAttributeLength(INT) + 1, "%-10d", root->blocknum[i]);
+			string tmp = root->attr[i];
+			string space = " ";
+			int len = tmp.size();
+			int k = 10;
+			int ir = 0;
+			for (k; k < attribute.attr_len - len + 10; k++) {
+				s[k] = ' ';
+			}
+			for (k; k < attribute.attr_len + 10; k++) {
+				s[k] = tmp[ir++];
+			}
+			s[k] = 0;
+			//sprintf_s(s + 10, GetAttributeLength(INT) + 1, "%-10d", root->attr[i]);
+			BM.WriteToMemory(tmp_block, s, length);
+			BM.WriteToDisk(iiindex_filename, tmp_block);
+			delete[]s;
+		}
+	}
+	else {
+		Block* tmp_block = BM.GetBlock(iiindex_filename);
+		for (int i = 0; i < root->keynum; i++) {
+			////cout << temp->attr[i] << " ";
+			char *s;
+			s = new char[maxlength];
+			memset(s, 0, maxlength);
+			int convert;
+			sprintf_s(s, GetAttributeLength(INT) + 1, "%-10d", -1);
+			string tmp = root->attr[i];
+			string space = " ";
+			int len = tmp.size();
+			int k = 10;
+			int ir = 0;
+			for (k; k < attribute.attr_len - len + 10; k++) {
+				s[k] = ' ';
+			}
+			for (k; k < attribute.attr_len + 10; k++) {
+				s[k] = tmp[ir++];
+			}
+			s[k] = 0;
+			//sprintf_s(s + 10, GetAttributeLength(INT) + 1, "%-10d", root->attr[i]);
+			BM.WriteToMemory(tmp_block, s, length);
+			BM.WriteToDisk(iiindex_filename, tmp_block);
+			delete[]s;
+		}
+		for (int i = 0; i <= root->keynum; i++) {
+			saveindex(root->child[i], attribute);
+		}
+	}
 }
 void  index_create_index(Table table, Attribute attribute, Bplus<string>* btree) {
 	int each_length = 30;//每条记录的长度
@@ -162,8 +303,8 @@ void  index_create_index(Table table, Attribute attribute, Bplus<string>* btree)
 	Block* temp[maxblock];//获取储存记录的块并存储
 	int i = 0;
 	int attribute_position = 0;//该属性在每个记录的位置
-							   //int blocknumber = BM.BlockNum(table.table_name + RECORD);//文件中有几个块
-	int blocknumber = 7;
+	int blocknumber = BM.BlockNum(rrrecord_filename);//文件中有几个块
+	//int blocknumber = 7;
 	for (i = 0; i < table.num_of_attribute; i++) {
 		if (attribute.attr_name == table.attribute[i].attr_name)break;
 		else {
@@ -173,43 +314,43 @@ void  index_create_index(Table table, Attribute attribute, Bplus<string>* btree)
 	if (i == table.num_of_attribute)return;//没有这个属性
 
 	for (int j = 1; j <= blocknumber; j++) {
-		temp[j] = BM.GetBlock("1.txt", j);
+		temp[j] = BM.GetBlock(rrrecord_filename, j);
 		int delet = temp[j]->FirstDelete;//初始化第一个被删除的位置
 		BM.SetPin(temp[j], true);
 		int recordnumber = (temp[j]->Size - BlockHeadSize) / each_length;//调用bm的函数
-		for (int i = 0; i < recordnumber; i++) {
+		for (int i = 1; i <= recordnumber; i++) {
 			if (i == delet) {
 				char* record = new char[100];
-				memcpy(record, temp[j]->memory + BlockHeadSize + i*each_length, each_length);
+				memcpy(record, temp[j]->memory + BlockHeadSize + (i-1)*each_length, each_length);
 				sscanf_s(record, "%d", &delet);
-				//cout << "delete: " << delet;
+				delete[]record;
+				////cout << "delete: " << delet;
 			}
 			else {
 				char* record = new char[100];
 				memset(record, 0, 100);
-				memcpy(record, temp[j]->memory + BlockHeadSize + i*each_length, each_length);
+				memcpy(record, temp[j]->memory + BlockHeadSize + (i-1)*each_length, each_length);
 				int offset = j;
 				char* char_value = new char[100];
 				memset(char_value, 0, 100);
 				int value;
 
 				if (attribute.attr_type == CHAR) {
-
-
 					memcpy(char_value, record + attribute_position, attri_length);
 					//	value=char_value;
 					string t = " ";
 					btree->insert_into_btree(char_value, CHAR, offset);
 					//sscanf_s(char_value, "%s", &value);
 					//btree_string->insert_into_btree(value, offset);
-					//cout << value << endl;
+					////cout << value << endl;
 				}
-
+				delete[]record;
+				delete[]char_value;
 			}
 
 		}
 	}
-	save_index(btree, attribute);
+	saveindex(btree->root, attribute);
 	return;
 }
 void  index_create_index(Table table, Attribute attribute, Bplus<int>* btree) {
@@ -218,8 +359,8 @@ void  index_create_index(Table table, Attribute attribute, Bplus<int>* btree) {
 	Block* temp[maxblock];//获取储存记录的块并存储
 	int i = 0;
 	int attribute_position = 0;//该属性在每个记录的位置
-							   //int blocknumber = BM.BlockNum(table.table_name + RECORD);//文件中有几个块
-	int blocknumber = 7;
+	int blocknumber = BM.BlockNum(rrrecord_filename);//文件中有几个块
+	//int blocknumber = 7;
 	for (i = 0; i < table.num_of_attribute; i++) {
 		if (attribute.attr_name == table.attribute[i].attr_name)break;
 		else {
@@ -229,21 +370,23 @@ void  index_create_index(Table table, Attribute attribute, Bplus<int>* btree) {
 	if (i == table.num_of_attribute)return;//没有这个属性
 
 	for (int j = 1; j <= blocknumber; j++) {
-		temp[j] = BM.GetBlock("1.txt", j);
+		temp[j] = BM.GetBlock(rrrecord_filename, j);
 		int delet = temp[j]->FirstDelete;//初始化第一个被删除的位置
 		BM.SetPin(temp[j], true);
 		int recordnumber = (temp[j]->Size - BlockHeadSize) / each_length;//调用bm的函数
-		for (int i = 0; i < recordnumber; i++) {
+		for (int i = 1; i <= recordnumber; i++) {
 			if (i == delet) {
 				char* record = new char[100];
-				memcpy(record, temp[j]->memory + BlockHeadSize + i*each_length, each_length);
+				memcpy(record, temp[j]->memory + BlockHeadSize + (i-1)*each_length, each_length);
 				sscanf_s(record, "%d", &delet);
-				//cout << "delete: " << delet;
+				////cout << "delete: " << delet;
+				delete[]record;
+		
 			}
 			else {
 				char* record = new char[100];
 				memset(record, 0, 100);
-				memcpy(record, temp[j]->memory + BlockHeadSize + i*each_length, each_length);
+				memcpy(record, temp[j]->memory + BlockHeadSize + (i-1)*each_length, each_length);
 				int offset = j;
 				char* char_value = new char[100];
 				memset(char_value, 0, 100);
@@ -253,14 +396,16 @@ void  index_create_index(Table table, Attribute attribute, Bplus<int>* btree) {
 					sscanf_s(char_value, "%d", &value);
 					int t = 0;
 					btree->insert_into_btree(value, INT, offset);
-					//cout << value << endl;
+					////cout << value << endl;
 
 				}
+				delete[]record;
+				delete[]char_value;
 			}
 
 		}
 	}
-	save_index(btree, attribute);
+	saveindex(btree->root, attribute);
 	return;
 }
 void  index_create_index(Table table, Attribute attribute, Bplus<float>* btree) {
@@ -269,8 +414,8 @@ void  index_create_index(Table table, Attribute attribute, Bplus<float>* btree) 
 	Block* temp[maxblock];//获取储存记录的块并存储
 	int i = 0;
 	int attribute_position = 0;//该属性在每个记录的位置
-							   //int blocknumber = BM.BlockNum(table.table_name + RECORD);//文件中有几个块
-	int blocknumber = 7;
+	int blocknumber = BM.BlockNum(rrrecord_filename);//文件中有几个块
+	//int blocknumber = 7;
 	for (i = 0; i < table.num_of_attribute; i++) {
 		if (attribute.attr_name == table.attribute[i].attr_name)break;
 		else {
@@ -280,45 +425,372 @@ void  index_create_index(Table table, Attribute attribute, Bplus<float>* btree) 
 	if (i == table.num_of_attribute)return;//没有这个属性
 
 	for (int j = 1; j <= blocknumber; j++) {
-		temp[j] = BM.GetBlock("1.txt", j);
+		temp[j] = BM.GetBlock(rrrecord_filename, j);
 		int delet = temp[j]->FirstDelete;//初始化第一个被删除的位置
 		BM.SetPin(temp[j], true);
 		int recordnumber = (temp[j]->Size - BlockHeadSize) / each_length;//调用bm的函数
-		for (int i = 0; i < recordnumber; i++) {
+		for (int i = 1; i <= recordnumber; i++) {
 			if (i == delet) {
 				char* record = new char[100];
-				memcpy(record, temp[j]->memory + BlockHeadSize + i*each_length, each_length);
+				memcpy(record, temp[j]->memory + BlockHeadSize + (i-1)*each_length, each_length);
 				sscanf_s(record, "%d", &delet);
-				//cout << "delete: " << delet;
+				delete[]record;
+				////cout << "delete: " << delet;
 			}
 			else {
 				char* record = new char[100];
 				memset(record, 0, 100);
-				memcpy(record, temp[j]->memory + BlockHeadSize + i*each_length, each_length);
+				memcpy(record, temp[j]->memory + BlockHeadSize + (i-1)*each_length, each_length);
 				int offset = j;
 				char* char_value = new char[100];
 				memset(char_value, 0, 100);
-				int value;
+				float value;
 
 				if (attribute.attr_type == FLOAT) {
-
-
 					memcpy(char_value, record + attribute_position, attri_length);
 					sscanf_s(char_value, "%f", &value);
-					float t = (float)1;
 					btree->insert_into_btree(value, FLOAT, offset);
-					//cout << value << endl;
+					////cout << value << endl;
 					//btree_float->insert_into_btree(value, offset);
+					
 				}
+				delete[]record;
+				delete[]char_value;
 			}
 
 		}
 	}
-	save_index(btree, attribute);
+	saveindex(btree->root, attribute);
 	return;
 }
+int query_on_index_from_file(Table table, Attribute index,int QAQ) {
+		Bplus<int>* bp;
+		int key = 0;
+		bp=read_from_block(table, index, key);
+		return bp->query_on_btree(QAQ);
+	return 0;
+}
+int query_on_index_from_file(Table table, Attribute index, string QAQ) {
+
+		Bplus<string>*bp;
+		string key = "";
+		bp = read_from_block(table, index, key);
+		return bp->query_on_btree(QAQ);
+		/*	int front, index;
+		front = index = 0;
+		Btree_node<string>* queue[100];
+		queue[index++] = bp->root;
+		while (front != index) {
+		Btree_node<string> * temp = queue[front];
+		front++;
+		if (!temp->isleaf) {
+		//cout << "next :" << endl;
+		for (int i = 0; i <= temp->keynum; i++) {
+		queue[index++] = temp->child[i];
+		}
+		}
+		//
+		//
+		//
+		cout << "level: " << endl;
+		cout << "isroot: " << temp->isroot << endl;
+		cout << "isleaf: " << temp->isleaf << endl;
+		for (int i = 0; i < temp->keynum; i++) {
+
+		cout << "attr: " << temp->attr[i] << " ";
+		cout << "block: " << temp->blocknum[i] << " ";
+		}
+		//cout << endl;
+
+		}
+		cout << "<<<<<<<<<<<<<<<<<<<<<" << endl;*/
+
+	return 0;
+}
+int query_on_index_from_file(Table table, Attribute index, float QAQ) {
+		Bplus<float>*bp;
+		float key = 1.1;
+		bp = read_from_block(table, index, key);
+		return bp->query_on_btree(QAQ);
+	return 0;
+}
+Btree_node<int>* read_index(int blocksum, int &blockid, string filename,int each_length,int attri_length,int key) {
+	Btree_node<int>* bt = NULL;
+	blockid++;
+	if (blockid <= blocksum) {
+		bt = new Btree_node<int>(iiindex_filename);
+		Block* temp;//获取储存记录的块并存储
+		temp = BM.GetBlock(iiindex_filename, blockid);
+		int recordnumber = (temp->Size - BlockHeadSize) / each_length;//调用bm的函数
+		int delet = temp->FirstDelete;
+		int index = 0;
+		for (int i = 1; i <= recordnumber; i++) {
+			if (i == delet) {
+				char* record = new char[100];
+				memcpy(record, temp->memory + BlockHeadSize + (i - 1)*each_length, each_length);
+				sscanf_s(record, "%d", &delet);
+				delete[]record;
+			}
+			else {
+				int off;
+				int val;
+				char* record = new char[100];
+				char* offset = new char[11];
+				char* value = new char[100];
+				memset(record, 0, 100);
+				memset(offset, 0, 11);
+				memset(value, 0, 100);
+				memcpy(record, temp->memory + BlockHeadSize + (i - 1)*each_length, each_length);//将一条记录读到record中
+				memcpy(offset, record, GetAttributeLength(INT));//将offset从record读到offset中
+				sscanf_s(offset, "%d", &off);//将offset读到int
+				memcpy(value, record + GetAttributeLength(INT), attri_length);//将值读到value中
+				sscanf_s(value, "%d", &val);
+				delete[]record;
+				delete[] offset;
+				delete[]value;
+				if (off == -1) {
+					bt->isleaf = false;
+					bt->attr[index] = val;
+					bt->blocknum[index] = off;
+					bt->keynum++;
+					index++;
+				}
+				else {
+					bt->isleaf = true;
+					bt->attr[index] = val;
+					bt->blocknum[index] = off;
+					bt->keynum++;
+					index++;
+				}
+				bt->min = bt->attr[0];
+			}
+		}
+		if (!bt->isleaf) {
+			for (int i = 0; i <= index; i++) {
+				int key = 0;
+				bt->child[i] = read_index(blocksum, blockid, filename, each_length, attri_length,key);
+			}
+		}
+	}
+	
+	return bt;
+}
+Btree_node<float>* read_index(int blocksum, int &blockid, string filename, int each_length, int attri_length, float key) {
+	Btree_node<float>* bt = NULL;
+	blockid++;
+	if (blockid <= blocksum) {
+		bt = new Btree_node<float>(iiindex_filename);
+		Block* temp;//获取储存记录的块并存储
+		temp = BM.GetBlock(iiindex_filename, blockid);
+		int recordnumber = (temp->Size - BlockHeadSize) / each_length;//调用bm的函数
+		int delet = temp->FirstDelete;
+		int index = 0;
+		for (int i = 1; i <= recordnumber; i++) {
+			if (i == delet) {
+				char* record = new char[100];
+				memcpy(record, temp->memory + BlockHeadSize + (i - 1)*each_length, each_length);
+				sscanf_s(record, "%d", &delet);
+				delete[]record;
+			}
+			else {
+				int off;
+				float val;
+				char* record = new char[100];
+				char* offset = new char[11];
+				char* value = new char[100];
+				memset(record, 0, 100);
+				memset(offset, 0, 12);
+				memset(value, 0, 100);
+				memcpy(record, temp->memory + BlockHeadSize + (i - 1)*each_length, each_length);//将一条记录读到record中
+				memcpy(offset, record, GetAttributeLength(INT));//将offset从record读到offset中
+				sscanf_s(offset, "%d", &off);//将offset读到int
+				memcpy(value, record + GetAttributeLength(INT), attri_length);//将值读到value中
+				sscanf_s(value, "%f", &val);
+				delete[]record;
+				delete[] offset;
+				delete[]value;
+				if (off == -1) {
+					bt->isleaf = false;
+					bt->attr[index] = val;
+					bt->blocknum[index] = off;
+					bt->keynum++;
+					index++;
+				}
+				else {
+					bt->isleaf = true;
+					bt->attr[index] = val;
+					bt->blocknum[index] = off;
+					bt->keynum++;
+					index++;
+				}
+				bt->min = bt->attr[0];
+			}
+		}
+		if (!bt->isleaf) {
+			for (int i = 0; i <= index; i++) {
+				float key = 0;
+				bt->child[i] = read_index(blocksum, blockid, filename, each_length, attri_length, key);
+			}
+		}
+	}
+
+	return bt;
+}
+Btree_node<string>* read_index(int blocksum, int &blockid, string filename, int each_length, int attri_length, string key) {
+	Btree_node<string>* bt = NULL;
+	blockid++;
+	if (blockid <= blocksum) {
+		bt = new Btree_node<string>(iiindex_filename);
+		Block* temp;//获取储存记录的块并存储
+		temp = BM.GetBlock(iiindex_filename, blockid);
+		int recordnumber = (temp->Size - BlockHeadSize) / each_length;//调用bm的函数
+		int delet = temp->FirstDelete;
+		int index = 0;
+		for (int i = 1; i <= recordnumber; i++) {
+			if (i == delet) {
+				char* record = new char[100];
+				memcpy(record, temp->memory + BlockHeadSize + (i - 1)*each_length, each_length);
+				sscanf_s(record, "%d", &delet);
+				delete[]record;
+			}
+			else {
+				int off;
+				string val;
+				char* record = new char[100];
+				char* offset = new char[11];
+				char* value = new char[100];
+				memset(record, 0, 100);
+				memset(offset, 0, 11);
+				memset(value, 0, 100);
+				memcpy(record, temp->memory + BlockHeadSize + (i - 1)*each_length, each_length);//将一条记录读到record中
+				memcpy(offset, record, GetAttributeLength(INT));//将offset从record读到offset中
+				sscanf_s(offset, "%d", &off);//将offset读到int
+				memcpy(value, record + GetAttributeLength(INT), attri_length);//将值读到value中
+				val = value;
+				delete[]record;
+				delete[] offset;
+				delete[]value;
+				if (off == -1) {
+					bt->isleaf = false;
+					bt->attr[index] = val;
+					bt->blocknum[index] = off;
+					bt->keynum++;
+					index++;
+				}
+				else {
+					bt->isleaf = true;
+					bt->attr[index] = val;
+					bt->blocknum[index] = off;
+					bt->keynum++;
+					index++;
+				}
+				bt->min = bt->attr[0];
+			}
+		}
+		if (!bt->isleaf) {
+			for (int i = 0; i <= index; i++) {
+				string key = "";
+				bt->child[i] = read_index(blocksum, blockid, filename, each_length, attri_length, key);
+			}
+		}
+	}
+
+	return bt;
+}
+Bplus<int>* read_from_block(Table table, Attribute index, int key) {
+	bool isroot = true;
+	int each_length;//每条记录的长度
+	int attri_length;
+	//if (index.attr_type == INT) {
+	each_length = GetAttributeLength(INT) + GetAttributeLength(index.attr_type, index.attr_len);//每条记录的长度
+	attri_length = GetAttributeLength(index.attr_type, index.attr_len);//该属性的长度
+																	   //}
+																	   /*else if (index.attr_type == FLOAT) {
+																	   each_length = GetAttributeLength(INT) + GetAttributeLength(index.attr_type, index.attr_len);//每条记录的长度
+																	   attri_length = GetAttributeLength(index.attr_type, index.attr_len);//该属性的长度
+																	   }
+																	   else if (index.attr_type == CHAR) {
+																	   each_length = GetAttributeLength(INT) + GetAttributeLength(index.attr_type, index.attr_len);//每条记录的长度
+																	   attri_length = GetAttributeLength(index.attr_type, index.attr_len);//该属性的长度
+																	   }*/
+	int blocknumber = BM.BlockNum(iiindex_filename);//获取文件中的块的数量
+	int attribute_position = 10;//该属性在每个记录的位置
+	int blockid = 0;//到文件的第几个块了
+	if (blocknumber == 0)return 0;
+	else {
+		string bt_name = "query";
+		Bplus<int>*bp = new Bplus<int>(bt_name, index.attr_type, index.attr_len);
+		//bp->root = new Btree_node<int>(iiindex_filename);
+		int key = 0;
+		bp->root = read_index(blocknumber, blockid, iiindex_filename, each_length, attri_length, key);
+		bp->root->isroot = true;
+		return bp;
 
 
+	}
+}
+Bplus<string>* read_from_block(Table table, Attribute index, string key) {
+	bool isroot = true;
+	int each_length;//每条记录的长度
+	int attri_length;
+	//if (index.attr_type == INT) {
+	each_length = GetAttributeLength(INT) + GetAttributeLength(index.attr_type, index.attr_len);//每条记录的长度
+	attri_length = GetAttributeLength(index.attr_type, index.attr_len);//该属性的长度
+																	   //}
+																	   /*else if (index.attr_type == FLOAT) {
+																	   each_length = GetAttributeLength(INT) + GetAttributeLength(index.attr_type, index.attr_len);//每条记录的长度
+																	   attri_length = GetAttributeLength(index.attr_type, index.attr_len);//该属性的长度
+																	   }
+																	   else if (index.attr_type == CHAR) {
+																	   each_length = GetAttributeLength(INT) + GetAttributeLength(index.attr_type, index.attr_len);//每条记录的长度
+																	   attri_length = GetAttributeLength(index.attr_type, index.attr_len);//该属性的长度
+																	   }*/
+	int blocknumber = BM.BlockNum(iiindex_filename);//获取文件中的块的数量
+	int attribute_position = 10;//该属性在每个记录的位置
+	int blockid = 0;//到文件的第几个块了
+	if (blocknumber == 0)return 0;
+	else {
+			string bt_name = "query";
+			Bplus<string>*bp = new Bplus<string>(bt_name, index.attr_type, index.attr_len);
+			//bp->root = new Btree_node<int>(iiindex_filename);
+			string key = " ";
+			bp->root = read_index(blocknumber, blockid, iiindex_filename, each_length, attri_length, key);
+			bp->root->isroot = true;
+			return bp;
+
+	}
+}
+Bplus<float>* read_from_block(Table table, Attribute index, float key) {
+	bool isroot = true;
+	int each_length;//每条记录的长度
+	int attri_length;
+	//if (index.attr_type == INT) {
+	each_length = GetAttributeLength(INT) + GetAttributeLength(index.attr_type, index.attr_len);//每条记录的长度
+	attri_length = GetAttributeLength(index.attr_type, index.attr_len);//该属性的长度
+																	   //}
+																	   /*else if (index.attr_type == FLOAT) {
+																	   each_length = GetAttributeLength(INT) + GetAttributeLength(index.attr_type, index.attr_len);//每条记录的长度
+																	   attri_length = GetAttributeLength(index.attr_type, index.attr_len);//该属性的长度
+																	   }
+																	   else if (index.attr_type == CHAR) {
+																	   each_length = GetAttributeLength(INT) + GetAttributeLength(index.attr_type, index.attr_len);//每条记录的长度
+																	   attri_length = GetAttributeLength(index.attr_type, index.attr_len);//该属性的长度
+																	   }*/
+	int blocknumber = BM.BlockNum(iiindex_filename);//获取文件中的块的数量
+	int attribute_position = 10;//该属性在每个记录的位置
+	int blockid = 0;//到文件的第几个块了
+	if (blocknumber == 0)return 0;
+	else {
+		string bt_name = "query";
+			Bplus<float>*bp = new Bplus<float>(bt_name, index.attr_type, index.attr_len);
+			//bp->root = new Btree_node<int>(iiindex_filename);
+			float key = 0;
+			bp->root = read_index(blocknumber, blockid, iiindex_filename, each_length, attri_length, key);
+			bp->root->isroot = true;
+			return bp;
+		
+	}
+}
 /*
 void drop_index_record(Attribute index) {//叫buffer删掉index文件
 
