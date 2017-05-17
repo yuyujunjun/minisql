@@ -9,7 +9,7 @@ public:
 	int typelength;
 	string indexname;//建立的索引的名字
 	Btree_node<T>* root;
-	bool insert_into_btree(T key, int offset);
+	bool insert_into_btree(T key, int type, int offset);
 	void insert_into_node(Btree_node<T> * node, T key, int offset, Btree_node<T>* child);
 	void split(Btree_node<T> *node);
 	bool delete_from_btree(T key);
@@ -57,8 +57,9 @@ template <class T> Btree_node<T>* Bplus<T>::find_leaf(T key) {
 	}
 	return now;
 }
-template <class T> bool Bplus<T>::insert_into_btree(T key, int offset) {
-	Btree_node<T>* leaf = find_leaf(key);
+template <class T> bool Bplus<T>::insert_into_btree(T key,int type, int offset) {
+	Btree_node<T>* leaf;
+	leaf = find_leaf(key);
 	for (int i = 0; i < leaf->keynum; i++) {
 		if (key == leaf->attr[i]) {//如果原来的那个块就有相同的键值
 			return false;
