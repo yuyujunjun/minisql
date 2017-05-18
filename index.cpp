@@ -3,7 +3,7 @@
 extern BufferManager BM;
 
 //需要修改的地方： table.table_name+"_"+__indexname__+INDEX:储存index信息的文件
-//rrrecord_filename储存记录的地方
+//table.table_name+RECORD储存记录的地方
 //每条记录的长度
 /*
 void save_index(Bplus<string>* btree, Attribute attribute) {
@@ -324,12 +324,12 @@ void saveindex(Btree_node<string>* root, Attribute attribute,int &index, string 
 	}
 }
 void  index_create_index(Table table, Attribute attribute, Bplus<string>* btree, string __indexname__) {
-	int each_length = 30;//每条记录的长度
+	int each_length = GetRecordLength(table);//每条记录的长度
 	int attri_length = GetAttributeLength(attribute.attr_type, attribute.attr_len);//该属性的长度
 	Block* temp[maxblock];//获取储存记录的块并存储
 	int i = 0;
 	int attribute_position = 0;//该属性在每个记录的位置
-	int blocknumber = BM.BlockNum(rrrecord_filename);//文件中有几个块
+	int blocknumber = BM.BlockNum(table.table_name+RECORD);//文件中有几个块
 	//int blocknumber = 7;
 	for (i = 0; i < table.num_of_attribute; i++) {
 		if (attribute.attr_name == table.attribute[i].attr_name)break;
@@ -340,7 +340,7 @@ void  index_create_index(Table table, Attribute attribute, Bplus<string>* btree,
 	if (i == table.num_of_attribute)return;//没有这个属性
 
 	for (int j = 1; j <= blocknumber; j++) {
-		temp[j] = BM.GetBlock(rrrecord_filename, j);
+		temp[j] = BM.GetBlock(table.table_name+RECORD, j);
 		int delet = temp[j]->FirstDelete;//初始化第一个被删除的位置
 		BM.SetPin(temp[j], true);
 		int recordnumber = (temp[j]->Size - BlockHeadSize) / each_length;//调用bm的函数
@@ -388,12 +388,12 @@ void  index_create_index(Table table, Attribute attribute, Bplus<string>* btree,
 	return;
 }
 void  index_create_index(Table table, Attribute attribute, Bplus<int>* btree, string __indexname__) {
-	int each_length = 30;//每条记录的长度
+	int each_length = GetRecordLength(table);//每条记录的长度
 	int attri_length = GetAttributeLength(attribute.attr_type, attribute.attr_len);//该属性的长度
 	Block* temp[maxblock];//获取储存记录的块并存储
 	int i = 0;
 	int attribute_position = 0;//该属性在每个记录的位置
-	int blocknumber = BM.BlockNum(rrrecord_filename);//文件中有几个块
+	int blocknumber = BM.BlockNum(table.table_name+RECORD);//文件中有几个块
 	//int blocknumber = 7;
 	for (i = 0; i < table.num_of_attribute; i++) {
 		if (attribute.attr_name == table.attribute[i].attr_name)break;
@@ -404,7 +404,7 @@ void  index_create_index(Table table, Attribute attribute, Bplus<int>* btree, st
 	if (i == table.num_of_attribute)return;//没有这个属性
 
 	for (int j = 1; j <= blocknumber; j++) {
-		temp[j] = BM.GetBlock(rrrecord_filename, j);
+		temp[j] = BM.GetBlock(table.table_name+RECORD, j);
 		int delet = temp[j]->FirstDelete;//初始化第一个被删除的位置
 		BM.SetPin(temp[j], true);
 		int recordnumber = (temp[j]->Size - BlockHeadSize) / each_length;//调用bm的函数
@@ -450,12 +450,12 @@ void  index_create_index(Table table, Attribute attribute, Bplus<int>* btree, st
 	return;
 }
 void  index_create_index(Table table, Attribute attribute, Bplus<float>* btree, string __indexname__) {
-	int each_length = 30;//每条记录的长度
+	int each_length = GetRecordLength(table);//每条记录的长度
 	int attri_length = GetAttributeLength(attribute.attr_type, attribute.attr_len);//该属性的长度
 	Block* temp[maxblock];//获取储存记录的块并存储
 	int i = 0;
 	int attribute_position = 0;//该属性在每个记录的位置
-	int blocknumber = BM.BlockNum(rrrecord_filename);//文件中有几个块
+	int blocknumber = BM.BlockNum(table.table_name+RECORD);//文件中有几个块
 	//int blocknumber = 7;
 	for (i = 0; i < table.num_of_attribute; i++) {
 		if (attribute.attr_name == table.attribute[i].attr_name)break;
@@ -466,7 +466,7 @@ void  index_create_index(Table table, Attribute attribute, Bplus<float>* btree, 
 	if (i == table.num_of_attribute)return;//没有这个属性
 
 	for (int j = 1; j <= blocknumber; j++) {
-		temp[j] = BM.GetBlock(rrrecord_filename, j);
+		temp[j] = BM.GetBlock(table.table_name+RECORD, j);
 		int delet = temp[j]->FirstDelete;//初始化第一个被删除的位置
 		BM.SetPin(temp[j], true);
 		int recordnumber = (temp[j]->Size - BlockHeadSize) / each_length;//调用bm的函数

@@ -2,7 +2,7 @@
 #include"all.h"
 #define maxblock 128
 #define maxlength 64
-#define rrrecord_filename "1.txt"
+#define rrrecord_filename table.table_name+RECORD
 #define iiindex_filename "index_name"
 #define tempfile "TEMPFILE"
 //块在文件中索引从1开始
