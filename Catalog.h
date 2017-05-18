@@ -8,7 +8,7 @@
 #include <stdio.h>
 using namespace std;
 
-int GetRecordLength(string tablename); //得到表中一条记录的长度
+int GetRecordLength(Table T); //得到表中一条记录的长度
 int GetAttributeLength(int type, int typelength = 0); //得到一种属性的长度
 
 void CreateTableCatalog(Table TableNode, string TableName); //创建一张表的catalog文件

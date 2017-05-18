@@ -7,10 +7,10 @@
 #include<vector>
 using namespace std;
 BufferManager BM;
-Btree_node<int> *queue[100];
+Btree_node<string> *queue[100];
 int index=0;
 int front = 0;
-
+/*
 void Print() {
 	while (front != index) {
 		Btree_node<int>* temp = queue[front];
@@ -21,17 +21,18 @@ void Print() {
 				queue[index++] = temp->child[i];
 			}
 		}
-		cout << "level: " << endl;
+		//cout << "level: " << endl;
 		for (int i = 0; i < temp->keynum; i++) {
-			if (temp->parent)
-				cout << temp->parent->min << " ";
+			if (temp->parent);
+			//	cout << temp->parent->min << " ";
 		}
-		cout << endl;
+	//	cout << endl;
 
 	}
-	cout << "<<<<<<<<<<<<<<<<<<<<<" << endl;
+	//cout << "<<<<<<<<<<<<<<<<<<<<<" << endl;
 }
 void Print1() {
+	
 	while (front != index) {
 		Btree_node<int> * temp = queue[front];
 		front++;
@@ -41,16 +42,19 @@ void Print1() {
 				queue[index++] = temp->child[i];
 			}
 		}
-		cout << "level: " << endl;
+		//
+		//
+		//
+		//cout << "level: " << endl;
 		for (int i = 0; i < temp->keynum; i++) {
-			cout << temp->attr[i] << " ";
+			//cout << temp->attr[i] << " ";
 		}
-		cout << endl;
+		//cout << endl;
 
 	}
 	cout << "<<<<<<<<<<<<<<<<<<<<<" << endl;
 }
-
+*/
 
 //BufferManager BM;
 
@@ -184,9 +188,31 @@ int main()
 	for (int i = 0; i < table.num_of_attribute; i++) {
 		cout << table.attribute[i].attr_name << endl;
 	}
-	index_create_index(table, aa, 1, &bp);
-	queue[index++] = bp.root;
-	Print1();
+	string __indexname__ = "TNT";
+	//string tyr = " ";
+	index_create_index(table, b, &bp, __indexname__);
+	cout<<query_on_index_from_file(table,b,"BBAAAAAAA", __indexname__)<<endl;
+	insert_into_index(table, b, "CC", 32, __indexname__);
+	cout << query_on_index_from_file(table, b, "CC", __indexname__)<<endl;
+	delete_from_index(table, b, "CC", __indexname__);
+	if (query_on_index_from_file(table, b, "CCCCCCCC&", __indexname__) == NULL)
+		cout << " no result" << endl;
+	//queue[index++] = bp.root;
+	//Print1();
+	char s[maxlength];
+	float aaaa = -1;
+//	sprintf_s(s, 12, "%-11f", aaaa);
+	//cout << s << endl;
+	//size_t convert;
+	//convert = GetAttributeLength(CHAR, 8);
+	//char tmp[10];
+	//sprintf_s(tmp, "%d", convert);
+	//string tmp2 = tmp;
+	//string convert_type;
+	//convert_type = convert_type + tmp2 + "s";
+	//sprintf_s(s + 10, convert + 1, convert_type.data(), "2222");
+	//cout << s;
+//	cout << "s";
 	//create_index();
 	//bp.Print_leaf();
 	/*	b\
@@ -368,7 +394,13 @@ void main()
 //计算一张表中记录的长度
 void main()
 {
-	int i = GetRecordLength("ohmygod");
+	Table T;
+	T.attribute[0].attr_type = CHAR;
+	T.attribute[0].attr_len = 9;
+	T.attribute[1].attr_type = INT;
+	T.attribute[2].attr_type = FLOAT;
+	T.num_of_attribute = 3;
+	int i = GetRecordLength(T);
 	cout << i;
 	getchar();
 }
@@ -450,10 +482,12 @@ void main()
 }
 */
 
+/*
 //检查所有索引（及其建在哪张表上）
 void main()
 {
 	AllIndex();
 	getchar();
 }
+*/
 

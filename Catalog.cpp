@@ -20,32 +20,20 @@ int GetAttributeLength(int type , int typelength)
 }
 //计算一个属性的长度
 
-int GetRecordLength(string tablename)
+int GetRecordLength(Table T)
 {
-	Table T;
-	int num;
+	int num = T.num_of_attribute;
 	int length=0;
-	//读出表的数据
-	T = FindTableCatalog(tablename);
-	if (T.table_name == tablename)
+	//把每个属性的长度相加
+	for (int i = 0; i < num; i++)
 	{
-		num = T.num_of_attribute;
-		//把每个属性的长度相加
-		for (int i = 0; i < num; i++)
-		{
-			length += GetAttributeLength(T.attribute[i].attr_type,T.attribute[i].attr_len);
-		}
-		return length;
+		length += GetAttributeLength(T.attribute[i].attr_type,T.attribute[i].attr_len);
 	}
-	else
-	{
-		cout << "the table is not exist" << endl;
-		return 0;
-	}
+	return length;
 }
 /*********************************************************************
 函数名：int GetRecordLength(string tablename)
-传入参数：表名
+传入参数：表结构信息
 返回值：该表一条属性的长度
 函数功能：计算表的记录的长度
 **********************************************************************/

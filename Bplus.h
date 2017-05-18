@@ -9,7 +9,7 @@ public:
 	int typelength;
 	string indexname;//建立的索引的名字
 	Btree_node<T>* root;
-	bool insert_into_btree(T key, int offset);
+	bool insert_into_btree(T key, int type, int offset);
 	void insert_into_node(Btree_node<T> * node, T key, int offset, Btree_node<T>* child);
 	void split(Btree_node<T> *node);
 	bool delete_from_btree(T key);
@@ -36,8 +36,8 @@ template <class T> Bplus<T>::Bplus(string indexname, int type, int typelength)
 	root->isleaf = true;
 	root->isroot = true;
 	int length = GetAttributeLength(INT) + GetAttributeLength(type, typelength);
-	//degree = (BlockSize - BlockHeadSize) / length;
-	degree = 4;
+	degree = (BlockSize - BlockHeadSize) / length;
+	//degree = 4;
 	this->indexname = indexname;
 	this->degree = degree;
 	this->typelength = typelength;
@@ -57,8 +57,9 @@ template <class T> Btree_node<T>* Bplus<T>::find_leaf(T key) {
 	}
 	return now;
 }
-template <class T> bool Bplus<T>::insert_into_btree(T key, int offset) {
-	Btree_node<T>* leaf = find_leaf(key);
+template <class T> bool Bplus<T>::insert_into_btree(T key,int type, int offset) {
+	Btree_node<T>* leaf;
+	leaf = find_leaf(key);
 	for (int i = 0; i < leaf->keynum; i++) {
 		if (key == leaf->attr[i]) {//如果原来的那个块就有相同的键值
 			return false;
@@ -98,13 +99,14 @@ template <class T> void Bplus<T>::split(Btree_node<T> *node) {
 		newnode->attr[i] = node->attr[i + (degree / 2 + 1)];
 		newnode->blocknum[i] = node->blocknum[i + (degree / 2 + 1)];
 		newnode->child[i] = node->child[i + (degree / 2 + 1)];
-		if (newnode->child[i])newnode->child[i]->parent = newnode;
+	//	if (newnode->child[i])
+		//	newnode->child[i]->parent = newnode;
 		//if (node->isroot)newnode->child[i]->parent = newnode;
 	}
 	newnode->child[newnode->keynum] = node->child[degree];
-	if (newnode->child[newnode->keynum])newnode->child[newnode->keynum]->parent = newnode;
+	//if (newnode->child[newnode->keynum])newnode->child[newnode->keynum]->parent = newnode;
 	node->keynum = degree / 2;
-	newnode->parent = node->parent;
+	//newnode->parent = node->parent;
 	if (node->isleaf) {
 		node->keynum++;
 		if (node->child[0])node->child[0]->lastsilbling = newnode;
@@ -114,7 +116,7 @@ template <class T> void Bplus<T>::split(Btree_node<T> *node) {
 		newnode->isleaf = true;
 		mid_key = node->attr[degree / 2 + 1];
 		newnode->min = newnode->attr[0];
-		newnode->parent = node->parent;
+		//newnode->parent = node->parent;
 	}
 	if (node->isroot) {
 		node->isroot = false;
@@ -126,7 +128,7 @@ template <class T> void Bplus<T>::split(Btree_node<T> *node) {
 		//node->parent = root;
 		root->keynum = 1;
 		root->min = root->attr[0];
-		node->parent = newnode->parent = root;
+		//node->parent = newnode->parent = root;
 		newnode->min = newnode->attr[0];
 
 		//newnode->min = newnode->attr[0];
@@ -134,11 +136,11 @@ template <class T> void Bplus<T>::split(Btree_node<T> *node) {
 
 	}
 	else {
-		newnode->parent = node->parent;
+		//newnode->parent = node->parent;
 		Btree_node<T> * par = find_parent(node, root);
 		//node->parent->child[node->parent->keynum+1]=newnode;
 		insert_into_node(par, mid_key, 0, newnode);
-		newnode->parent = node->parent = find_parent(node, root);
+		//newnode->parent = node->parent = find_parent(node, root);
 	}
 	/*cout << "midnum: " << mid_key << endl;
 	//cout << "parent: " << node->parent << endl;
