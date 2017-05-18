@@ -47,6 +47,9 @@ public:
 		}
 		
 	}
+	Table()
+	{
+	}
 };
 
 class Condition {
@@ -70,7 +73,7 @@ struct Block
 	bool last; //是否是最后一个块
 	char * memory;  //指向储存空间
 };
-
+//声明LRU算法所需要的结构
 struct LRUNode
 {
 	Block* BlockNode;

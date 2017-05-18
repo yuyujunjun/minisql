@@ -59,7 +59,7 @@ void Print1() {
 
 
 
-//*
+/*
 int main()
 {
 	string command;
@@ -67,7 +67,7 @@ int main()
 	Interpreter inter;
 	string a = "id";
 	Bplus<int> bp(a, 1, 4);
-	/*//queue[index++] = bp.root;
+	//queue[index++] = bp.root;
 	bp.insert_into_btree("9",20);
 	//Print();
 	//queue[index++] = bp.root;
@@ -170,7 +170,7 @@ int main()
 
 	Print();
 	queue[index++] = bp.root;
-	Print1();*/
+	Print1();
 	Attribute aa("a", INT, true, true, 4);
 	Attribute b("b", CHAR, true, true, 9);
 	Attribute c("c", FLOAT, true, true, 4);
@@ -196,13 +196,14 @@ int main()
 	status = inter.interpreter(command);
 	if (status == quit)break;
 
-	}**/
+	}
 	//cout << bp.query_on_btree("18")<<" "<<bp.query_on_btree("11");
 	return 0;
 }
-//*/
+*/
 
 /*
+//检查块的写入问题
 void main()
 {
 	for (int i = 0; i < 3; i++)
@@ -231,6 +232,7 @@ void main()
 */
 
 /*
+//检查读指定块到缓冲区中的数据
 void main()
 {
 	Block* T;
@@ -239,6 +241,7 @@ void main()
 */
 
 /*
+//检查叶节点判断
 void main()
 {
 	Block* B;
@@ -250,6 +253,7 @@ void main()
 */
 
 /*
+//检查BufferManager的构造函数和析构函数
 int main()
 {
 	int i = 0;
@@ -263,6 +267,7 @@ int main()
 */
 
 /*
+//将MaxBlock设置为4检查LRU算法
 void main()
 {
 	Block* B;
@@ -277,7 +282,9 @@ void main()
 */
 
 
-/*void main()
+/*
+//检查块的获取，写入
+void main()
 {
 	Block* B;
 	string s;
@@ -289,6 +296,7 @@ void main()
 }*/
 
 /*
+//检查文件中的块数，块中的记录数
 void main()
 {
 	Block* B;
@@ -311,6 +319,7 @@ void main()
 */
 
 /*
+//检查写入块中再写入文件
 void main()
 {
 	Block* B;
@@ -320,3 +329,131 @@ void main()
 	BM.WriteToDisk("test.txt", B);
 }
 */
+
+/*
+//创建一张表
+void main()
+{
+	int i;
+	Attribute A[32];
+	A[0].attr_len = 9;
+	A[0].attr_name = "ohhmychar";
+	A[0].attr_type = CHAR;
+	A[0].NOTNULL = false;
+	A[0].UNIQUE = false;
+	A[1].attr_len = 10;
+	A[1].attr_name = "ohhhmyint";
+	A[1].attr_type = INT;
+	A[1].NOTNULL = true;
+	A[2].UNIQUE = true;
+	A[2].attr_len = 11;
+	A[2].attr_name = "ohmyfloat";
+	A[2].attr_type = FLOAT;
+	A[2].NOTNULL = true;
+	A[2].UNIQUE = false;
+	Table T("ohmygod",3,1,A);
+	CreateTableCatalog(T, "ohmygod");
+}
+*/
+
+/*
+//读取表的数据
+void main()
+{
+	Table T = FindTableCatalog("ohmygod");
+}
+*/
+
+/*
+//计算一张表中记录的长度
+void main()
+{
+	int i = GetRecordLength("ohmygod");
+	cout << i;
+	getchar();
+}
+*/
+
+/*
+//创建，删除表
+void main()
+{
+	int i;
+	Attribute A[32];
+	A[0].attr_len = 9;
+	A[0].attr_name = "ohhmychar";
+	A[0].attr_type = CHAR;
+	A[0].NOTNULL = false;
+	A[0].UNIQUE = false;
+	A[1].attr_len = 10;
+	A[1].attr_name = "ohhhmyint";
+	A[1].attr_type = INT;
+	A[1].NOTNULL = true;
+	A[2].UNIQUE = true;
+	A[2].attr_len = 11;
+	A[2].attr_name = "ohmyfloat";
+	A[2].attr_type = FLOAT;
+	A[2].NOTNULL = true;
+	A[2].UNIQUE = false;
+	Table T("ohmygod", 3, 1, A);
+	CreateTableCatalog(T, "ohmygod");
+	CreateTableCatalog(T, "ohmygood");
+	CreateTableCatalog(T, "ohmygoood");
+	CreateTableCatalog(T, "ohmygooood");
+	CreateTableCatalog(T, "ohmygoooood");
+	//DropTableCatalog("ohmygood");
+	getchar();
+}
+*/
+
+/*
+//查看所有表
+int main()
+{
+	AllTable();
+	return 0;
+}
+*/
+
+/*
+//创建，删除索引文件
+int main()
+{
+	Attribute A;
+	A.attr_len = 9;
+	A.attr_name = "ohmychar";
+	A.attr_type = CHAR;
+	A.NOTNULL = true;
+	A.UNIQUE = true;
+	Attribute B;
+	B.attr_len = 11;
+	B.attr_name = "ohmyfloat";
+	B.attr_type = FLOAT;
+	B.NOTNULL = true;
+	B.UNIQUE = true;
+	CreateIndexCatalog(A,"indONohmygod","ohmygod");
+	CreateIndexCatalog(A, "indONohmygod", "ohmygood");
+	CreateIndexCatalog(A, "indONohmygod", "ohmygoood");
+	CreateIndexCatalog(B, "indONohmygod", "ohmygooood");
+	CreateIndexCatalog(B, "INDonOhmygod", "ohmygod");//我的电脑上大小写不同视为同一文件，不能写入
+	//DropIndexCatalog("indONohmygod", "ohmygood");
+	return 0;
+}
+*/
+
+/* 
+//读取一个属性
+void main()
+{
+	Attribute A;
+	A = GetAttributeOfIndex("indONohmygod","ohmygod");
+}
+*/
+
+//检查所有索引（及其建在哪张表上）
+void main()
+{
+	AllIndex();
+	getchar();
+}
+

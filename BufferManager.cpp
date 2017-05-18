@@ -21,7 +21,7 @@ BufferManager::BufferManager()
 	LRUHead->pre = NULL;
 	LRUHead->aft = NULL;
 }
-
+//构造函数
 
 BufferManager::~BufferManager()
 {
@@ -44,6 +44,7 @@ BufferManager::~BufferManager()
 	}
 	delete temp;
 }
+//析构函数
 
 void BufferManager::InitalBlock(Block* Resource)
 {
@@ -75,6 +76,13 @@ void BufferManager::InitalBlock(Block* Resource)
 	else
 		cout << "the block is pinned" << endl;
 }
+/******************************************************************
+函数名：void InitalBlock(Block* Resource)
+传入参数：一个块的指针
+返回值：无
+函数功能：将一个块初始化为空块
+*******************************************************************/
+
 
 Block* BufferManager::GetBlock(string FileName,int blocknumber)
 
@@ -86,9 +94,10 @@ Block* BufferManager::GetBlock(string FileName,int blocknumber)
 		cout << "no such file" << endl;
 		return NULL;
 	}
-	if (0 == blocknumber)
+	if (0 == blocknumber)  //该参数缺省，获得一个新的块，位置是文件最后一块的下一个位置
 	{
 		int i;
+		//在缓冲区中找到一个没被使用过的块，并给该块添加一些初始信息
 		for (i = 0; i < MaxBlock; i++)
 			if (BufferBlock[i]->Filename == "")
 			{
@@ -113,17 +122,20 @@ Block* BufferManager::GetBlock(string FileName,int blocknumber)
 
 				return BufferBlock[i];
 			}
-		//LRU
+		//若缓冲区中块都被使用，则用LRU算法获得新块
 		LRUNode * temp;
 		temp = LRUHead;
+		//找到最后一个没被锁定的块
 		while (NULL != temp->aft)
 			temp = temp->aft;
 		while (true == temp->BlockNode->pin)
 			temp = temp->pre;
+		//块中的信息被修改过，则写入磁盘
 		if (true == temp->BlockNode->IsWritten)
 		    WriteToDisk(temp->BlockNode->Filename,temp->BlockNode);
+		//将块中的内容清除
 		InitalBlock(temp->BlockNode);
-
+		//重构链表
 		temp->pre->aft = temp->aft;
 		if (NULL != temp->aft)
 			temp->aft->pre = temp->pre;
@@ -139,10 +151,12 @@ Block* BufferManager::GetBlock(string FileName,int blocknumber)
 		int i;
 		LRUNode* temp;
 		temp = LRUHead;
+		//在缓冲区中找是否存在该块
 		for (i = 0; i < MaxBlock; i++)
 			if (BufferBlock[i]->Filename == FileName && BufferBlock[i]->BlockNum == blocknumber)
 			{
 				BufferBlock[i]->last = IsLast(BufferBlock[i]);
+				//找到该块对应的LRUNode,并为LRU算法重构链表
 				while (NULL != temp->aft)
 				{
 					temp = temp->aft;
@@ -167,14 +181,22 @@ Block* BufferManager::GetBlock(string FileName,int blocknumber)
 					return NULL;
 				}
 			}
+		//若缓冲区中没有则从文件中读出该块
 		return ReadToBlock(FileName, blocknumber);
 	}
 }
+/*******************************************************************
+函数名：Block* GetBlock(string FileName,int blocknumber)
+传入参数：该块对应的文件名，该块是文件中的第几个块（缺省为0）
+返回值：一个块的指针
+函数功能：获得一个指定的块或者一个全新的块
+********************************************************************/
 
 void BufferManager::SetPin(Block * BlockNode, bool IfPin)
 {
 	BlockNode->pin = IfPin;
 }
+//给块上锁，解锁
 
 void BufferManager::WriteToDisk(string FileName, Block * BlockNode)
 {
@@ -186,6 +208,7 @@ void BufferManager::WriteToDisk(string FileName, Block * BlockNode)
 	int big = BlockNode->Size;
 	int begin = 5;
 
+	//找到给定块该写到文件中的位置
 	file.open(FileName);
 	file.seekg(begin, ios::beg);
 	temp[5] = 0;
@@ -200,6 +223,7 @@ void BufferManager::WriteToDisk(string FileName, Block * BlockNode)
 	}
 	file.close();
 	file.clear();
+	//将块中的信息写到文件中
 	if (BlockNode->BlockNum == num)
 	{
 		file2.open(FileName,ios::in);
@@ -207,11 +231,19 @@ void BufferManager::WriteToDisk(string FileName, Block * BlockNode)
 		file2.write(BlockNode->memory,big);
 		file2.close();
 		file2.clear();
+		//写到文件后，该块是否被修改过设为否
 		BlockNode->IsWritten = false;
 	}
 	else
 		cout << "no such block" << endl;
 }
+/*********************************************************************
+函数名：void WriteToDisk(string FileName, Block * BlockNode)
+传入参数：文件名，一个块的指针
+返回值：无
+函数功能：将一个块写到文件中的指定位置，是覆盖操作，写到文件中不会清
+          除缓存。
+**********************************************************************/
 
 Block * BufferManager::ReadToBlock(string FileName,int blocknumber)
 {
@@ -221,6 +253,7 @@ Block * BufferManager::ReadToBlock(string FileName,int blocknumber)
 	char temp[6];
 	int size;
 	int begin = 5;
+	//根据一个块的size找下一个块（size存在块头，偏移量为5）
 	file.open(FileName);
 	file.seekg(begin, ios::beg);
 	temp[5] = 0;
@@ -240,6 +273,7 @@ Block * BufferManager::ReadToBlock(string FileName,int blocknumber)
 			return NULL;
 		}
 	}
+	//把找到的块读到缓存中，并根据块头参数和函数参数对返回块进行初始化
 	begin = begin - 5 - size;
 	file.seekg(begin, ios::beg);
 	if (file.read(temp, 5))
@@ -274,11 +308,18 @@ Block * BufferManager::ReadToBlock(string FileName,int blocknumber)
 		return NULL;
 	}
 }
+/********************************************************************
+函数名:Block* ReadToBlock(string FileName,int blocknumber)
+传入参数：文件名，文件中的第几个块
+返回值：文件中指定块的指针
+函数功能：获得指定文件中的指定位置的块
+*********************************************************************/
 
 int BufferManager::GetUsingSize(Block * BlockNode)
 {
 	return BlockNode->Size;
 }
+//返回块的使用大小
 
 int BufferManager::BlockNum(string FileName)
 {
@@ -291,6 +332,7 @@ int BufferManager::BlockNum(string FileName)
 	file.open(FileName);
 	file.seekg(begin,ios::beg);	
 	temp[5] = 0;
+	//根据块头中的size找块，直到找不到位置，统计块的数量
 	while (file.read(temp, 5))
 	{
 			sscanf_s(temp, "%d", &size);
@@ -303,14 +345,23 @@ int BufferManager::BlockNum(string FileName)
 
 	return num;
 }
+/***************************************************************
+函数名：int BlockNum(string FileName)
+传入参数：文件名
+返回值：文件中块的个数
+函数功能：计算文件中块的个数
+****************************************************************/
 
 void BufferManager::SetHead(Block* Temp)
 {
+	//块头：块在文件中的位置，块的大小，一条记录的大小，第一条被删除记录的位置，各占5个字符（包括1个空格）
 	char offset[5], size[5], record[5], firstdelete[5];
 	//memset(offset, 0, 5);
 	//memset(size, 0, 5);
 	//memset(record, 0, 5);
 	//memset(firstdelete, 0, 5);
+
+	//左对齐，右边补空格
 	sprintf_s(offset, 5 , "%-4d", Temp->BlockNum);
 	offset[strlen(offset)] = ' ';
 	sprintf_s(size, 5 , "%-4d", Temp->Size);
@@ -319,41 +370,63 @@ void BufferManager::SetHead(Block* Temp)
 	record[strlen(record)] = ' ';
 	sprintf_s(firstdelete, 5 , "%-4d", Temp->FirstDelete);
 	firstdelete[strlen(firstdelete)] = ' ';
+	//将块的重要信息写到块头中
 	memcpy(Temp->memory, offset, 5);
 	memcpy(Temp->memory + 5, size, 5);
 	memcpy(Temp->memory + 10, record, 5);
 	memcpy(Temp->memory + 15, firstdelete, 5);
 }
-
+/****************************************************************************
+函数名：void SetHead(Block* Temp)
+传入参数：一个块的指针
+返回值：无
+函数功能：设置一个块的块头信息，之后可以写入文件
+*****************************************************************************/
 
 void BufferManager::WriteToMemory(Block* t,char * s, int length,int recordnumber)
 {
+	//参数缺省，默认追加到块的最后，插入时使用很方便
 	if (0 == recordnumber)
 	{
+		//块满了不能写，若不是文件中最后一个块，则不能写（改变块大小写回文件时，会覆盖到后面的内容，若块的大小改变，建议设置临时文件）
 		if (!IsFull(t, length) && IsLast(t))
 		{
+			//拷贝到块中
 			memcpy(t->memory + t->Size, s, length);
+			//更新块的信息
 			t->Size += length;
 			t->RecordLength = length;
 			t->IsWritten = true;
+			//重设块头
 			SetHead(t);
 		}
 		else
 			cout << "the block can not be wrote" << endl;
 	}
+	//写到块的指定位置，由于不判断是否为最后一个块，该函数不安全，需要保证此操作不改变块的大小
 	else
 	{
 		if ((recordnumber*length + BlockHeadSize) <= t->Size)
 		{
+			//拷贝到块中
 			memcpy(t->memory + (recordnumber - 1)*length + BlockHeadSize, s, length);
+			//更新块的新的
 			t->RecordLength = length;
 			t->IsWritten = true;
+			//重设块头
 			SetHead(t);
 		}
 		else
 			cout << "the block is too small" << endl;
 	}
 }
+/********************************************************************************
+函数名：void WriteToMemory(Block* t,char * s, int length,int recordnumber)
+传入参数：一个块的指针，要写入块的内容，该内容长度，写到块中的位置（缺省默认追
+          加到最后）
+返回值：无
+函数功能
+*********************************************************************************/
 
 char* BufferManager::GetRecordByNum(Block * t, int recordnumber,int length)
 {
@@ -363,6 +436,7 @@ char* BufferManager::GetRecordByNum(Block * t, int recordnumber,int length)
 	memcpy(s,t->memory+BlockHeadSize+(recordnumber-1)*length,length);
 	return s;
 }
+//读取文件中指定（第i条）记录
 
 bool BufferManager::IsFull(Block * t,int length)
 {
@@ -371,6 +445,7 @@ bool BufferManager::IsFull(Block * t,int length)
 	else
 		return true;
 }
+//判断块是否满了
 
 bool BufferManager::IsLast(Block * temp)
 {
@@ -379,6 +454,7 @@ bool BufferManager::IsLast(Block * temp)
 	else
 		return false;
 }
+//判断块是否是文件中的最后一个块
 
 bool BufferManager::IsLeaf(Block * temp)
 {
@@ -392,9 +468,10 @@ bool BufferManager::IsLeaf(Block * temp)
 	else
 		return false;
 }
+//判断该块是否为叶节点
 
 int BufferManager::GetRecordNum(Block * temp, int length)
 {
 	return (temp->Size-BlockHeadSize) / length;
 }
-
+//获得该块中有多少条记录
