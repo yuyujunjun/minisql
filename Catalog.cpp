@@ -3,11 +3,11 @@
 
 int GetAttributeLength(int type , int typelength)
 {
-	if (type = INT)
+	if (type == INT)
 	{
 		return 10;
 	}
-	else if (type = FLOAT)
+	else if (type == FLOAT)
 	{
 		return 11;
 	}
