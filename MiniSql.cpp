@@ -7,10 +7,10 @@
 #include<vector>
 using namespace std;
 BufferManager BM;
-Btree_node<int> *queue[100];
+Btree_node<string> *queue[100];
 int index=0;
 int front = 0;
-
+/*
 void Print() {
 	while (front != index) {
 		Btree_node<int>* temp = queue[front];
@@ -21,17 +21,18 @@ void Print() {
 				queue[index++] = temp->child[i];
 			}
 		}
-		cout << "level: " << endl;
+		//cout << "level: " << endl;
 		for (int i = 0; i < temp->keynum; i++) {
-			if (temp->parent)
-				cout << temp->parent->min << " ";
+			if (temp->parent);
+			//	cout << temp->parent->min << " ";
 		}
-		cout << endl;
+	//	cout << endl;
 
 	}
-	cout << "<<<<<<<<<<<<<<<<<<<<<" << endl;
+	//cout << "<<<<<<<<<<<<<<<<<<<<<" << endl;
 }
 void Print1() {
+	
 	while (front != index) {
 		Btree_node<int> * temp = queue[front];
 		front++;
@@ -41,16 +42,19 @@ void Print1() {
 				queue[index++] = temp->child[i];
 			}
 		}
-		cout << "level: " << endl;
+		//
+		//
+		//
+		//cout << "level: " << endl;
 		for (int i = 0; i < temp->keynum; i++) {
-			cout << temp->attr[i] << " ";
+			//cout << temp->attr[i] << " ";
 		}
-		cout << endl;
+		//cout << endl;
 
 	}
 	cout << "<<<<<<<<<<<<<<<<<<<<<" << endl;
 }
-
+*/
 
 //BufferManager BM;
 
@@ -66,7 +70,7 @@ int main()
 	int status = -1;
 	Interpreter inter;
 	string a = "id";
-	Bplus<int> bp(a, 1, 4);
+	Bplus<string> bp(a, CHAR, 9);
 	/*//queue[index++] = bp.root;
 	bp.insert_into_btree("9",20);
 	//Print();
@@ -171,7 +175,7 @@ int main()
 	Print();
 	queue[index++] = bp.root;
 	Print1();*/
-	Attribute aa("a", INT, true, true, 4);
+	Attribute aa("a",INT, true, true, 4);
 	Attribute b("b", CHAR, true, true, 9);
 	Attribute c("c", FLOAT, true, true, 4);
 	Attribute attr[3];
@@ -184,9 +188,31 @@ int main()
 	for (int i = 0; i < table.num_of_attribute; i++) {
 		cout << table.attribute[i].attr_name << endl;
 	}
-	index_create_index(table, aa, 1, &bp);
-	queue[index++] = bp.root;
-	Print1();
+	string __indexname__ = "TNT";
+	//string tyr = " ";
+	index_create_index(table, b, &bp, __indexname__);
+	cout<<query_on_index_from_file(table,b,"BBAAAAAAA", __indexname__)<<endl;
+	insert_into_index(table, b, "CC", 32, __indexname__);
+	cout << query_on_index_from_file(table, b, "CC", __indexname__)<<endl;
+	delete_from_index(table, b, "CC", __indexname__);
+	if (query_on_index_from_file(table, b, "CCCCCCCC&", __indexname__) == NULL)
+		cout << " no result" << endl;
+	//queue[index++] = bp.root;
+	//Print1();
+	char s[maxlength];
+	float aaaa = -1;
+//	sprintf_s(s, 12, "%-11f", aaaa);
+	//cout << s << endl;
+	//size_t convert;
+	//convert = GetAttributeLength(CHAR, 8);
+	//char tmp[10];
+	//sprintf_s(tmp, "%d", convert);
+	//string tmp2 = tmp;
+	//string convert_type;
+	//convert_type = convert_type + tmp2 + "s";
+	//sprintf_s(s + 10, convert + 1, convert_type.data(), "2222");
+	//cout << s;
+//	cout << "s";
 	//create_index();
 	//bp.Print_leaf();
 	/*	b\
