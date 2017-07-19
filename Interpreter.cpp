@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "Interpreter.h"
-#include"minisql.h"
 #include<vector>
-#include <string.h>
+#include<string>
 #include<sstream>
 using namespace std;
+//if input is wrong, we return 0, else we call the funcation from api and return 1
+extern API api;
 int op_for_sure(string word,int &op) {
 	if (strcmp(word.c_str(), "<") == 0)op = LESS;
 	else if (strcmp(word.c_str(), ">") == 0)op = MORE;
@@ -112,7 +113,7 @@ int Interpreter::interpreter(string command) {
 					if (strcmp(word.c_str(), ",") != 0)
 					{
 						if (strcmp(word.c_str(), ")") != 0) {
-							cout << "Syntax Error for ,!" << endl;
+							cout << "Syntax Error for ',' !" << endl;
 							return 0;
 						}
 						else
@@ -168,7 +169,7 @@ int Interpreter::interpreter(string command) {
 						cout << "Syntax Error: unknown error" << endl;
 						return 0;
 					}
-					//这里调用api建表
+					api.CreateTableAPI(table_name, attr_array, primary_position);
 					int i = 0;
 					for (i = 0; i < attr_array.size(); i++) {
 						cout << "name: " << attr_array[i].attr_name << " type:" << attr_array[i].attr_type << " unique:" << attr_array[i].UNIQUE << " notnull:" << attr_array[i].NOTNULL<<endl;
@@ -201,11 +202,49 @@ int Interpreter::interpreter(string command) {
 				attr_name = word;
 				word = get_word(command, index);
 				if(strcmp(word.c_str(),")")!=0) { cout << "Syntax Error!" << endl; return 0; }
-				//这里调用api的新建索引
+				api.CreateIndexAPI(index_name, attr_name, table_name);
 				cout << "index name:" << index_name << " table name:" << table_name << " attr_name:" << attr_name << endl;
 				return 1;
 			}
 		}
+		else if (strcmp(word.c_str(), "insert") == 0) {
+			word = get_word(command, index);
+			vector <string> attr;
+			string table = "";
+			if (strcmp(word.c_str(), "into") == 0) {
+				word = get_word(command, index);
+				if (!word.empty()) {
+					table = word;
+					word = get_word(command,index);
+					if (strcmp(word.c_str(), "values") == 0) {
+						word = get_word(command, index);
+						if (strcmp(word.c_str(), "(") != 0) { cout << "Syntax Error!" << endl; return 0; }
+						else {
+							word = get_word(command, index);
+							if (!word.empty()) {
+								while (!word.empty()&&strcmp(word.c_str(), ")") != 0) {
+									attr.push_back(word);
+									word = get_word(command, index);
+									if (strcmp(word.c_str(), ",") != 0) {
+										if (strcmp(word.c_str(), ")")!= 0)
+											{ cout << "Syntax Error!" << endl; return 0; }
+									}
+									else word = get_word(command, index);
+								}
+							}else { cout << "Syntax Error!" << endl; return 0; }
+						}
+					}
+					else { cout << "Syntax Error!" << endl; return 0; }
+				}
+				else { cout << "Syntax Error!" << endl; return 0; }
+				
+			}else { cout << "Syntax Error!" << endl; return 0; }
+			cout << "table name: " << table;
+			for (int i = 0; i < attr.size();i++) {
+				cout << "attr:" << attr[i] << endl;
+			}
+			api.InsertRecordAPI(table,attr);
+	}
 		else if (strcmp(word.c_str(), "select") == 0) {
 			word = get_word(command, index);
 			vector<string> attr_name;
@@ -225,15 +264,19 @@ int Interpreter::interpreter(string command) {
 			if (!word.empty())table_name = word;
 			else { cout << "Syntax Error!" << endl; return 0; }
 			word = get_word(command, index);
+			
 			if (word.empty()) {
-				if (attr_name.size() == 0)//调用select * from table_name
+				if (attr_name.size() == 0) {
+					api.SelectRecordAPI(table_name, attr_name);//调用select * from table_name
 					cout << "table_name:" << table_name << "no condition" << endl;
+				}
 				else {
 					cout << "table_name:" << table_name << "no condition" << endl;
 					for (int i = 0; i < attr_name.size(); i++) {
 						cout <<" attr_name:"<< attr_name[i] << endl;
 					}
 				}
+				
 			}
 			else if(strcmp(word.c_str(),"where")==0)
 			{
@@ -258,8 +301,10 @@ int Interpreter::interpreter(string command) {
 						word = get_word(command, index);
 					}else { cout << "Syntax Error!" << endl; return 0; }
 				}
+				
 				if (attr_name.size() == 0)//有情况的查询select * from where
 				{
+					api.SelectRecordAPI(table_name, condition_array, attr_name);
 					cout << "table_name:" << table_name  << endl;
 					for (int i = 0; i < condition_array.size(); i++) {
 						cout << "left:" << condition_array[i].Left << " " << condition_array[i].op << " " << condition_array[i].Right << endl;
@@ -277,25 +322,6 @@ int Interpreter::interpreter(string command) {
 				return 1;
 			}
 		}
-		else if (strcmp(word.c_str(), "drop") == 0)
-		{
-			word = get_word(command, index);
-			if (strcmp(word.c_str(), "table") == 0) {
-				word = get_word(command, index);
-				if (!word.empty()) {
-					//调用api的drop table
-					return 1;
-				}
-				else { cout << "Syntax Error!" << endl; return 0; }
-			}
-			else if (strcmp(word.c_str(), "index") == 0) {
-				word = get_word(command, index);
-				if (!word.empty()) {
-					//调用drop index
-					return 1;
-				}else { cout << "Syntax Error!" << endl; return 0; }
-			}else { cout << "Syntax Error!" << endl; return 0; }
-		}
 		else if (strcmp(word.c_str(), "delete") == 0)
 		{
 			string table_name = "";
@@ -305,8 +331,9 @@ int Interpreter::interpreter(string command) {
 			if(word.empty()) { cout << "Syntax Error!" << endl; return 0; }
 			else table_name = word;
 			word = get_word(command,index);
+			api.DeleteRecordAPI(table_name);
 			if (word.empty()) {
-				//调用api的delete from A
+				api.DeleteRecordAPI(table_name);//调用api的delete from A
 				return 1;
 			}
 			else if (strcmp(word.c_str(), "where") == 0) {
@@ -332,34 +359,41 @@ int Interpreter::interpreter(string command) {
 					}
 					else { cout << "Syntax Error!" << endl; return 0; }
 				}//调用delete from a where condition
+				api.DeleteRecordAPI(table_name, condition_array);
 				return 1;
 			}
 			
 		}
-		else if (strcmp(word.c_str(), "insert") == 0)
+		else if (strcmp(word.c_str(), "drop") == 0)
 		{
+			string index_name = "";
 			string table_name = "";
-			vector<string> value_array;
 			word = get_word(command, index);
-			if(strcmp(word.c_str(), "into") != 0) { cout << "Syntax Error!" << endl; return 0; }
-			word = get_word(command, index);
-			if (!word.empty())table_name = word;
-			else { cout << "Syntax Error!" << endl; return 0; }
-			word = get_word(command, index);
-			if(strcmp(word.c_str(),"values")!=0) { cout << "Syntax Error!" << endl; return 0; }
-			word = get_word(command, index);
-			if(strcmp(word.c_str(),"(")!=0) { cout << "Syntax Error!" << endl; return 0; }
-			word = get_word(command, index);
-			while (!word.empty() && strcmp(word.c_str(), ")") != 0)
-			{
-				string values = word;
-				if(strcmp(values.c_str(),",")!=0)value_array.push_back(values);
-				word = get_word(command, index);
-
+			if (strcmp(word.c_str(), "table") == 0) {
+				table_name = get_word(command, index);
+				if (!word.empty()) {
+					api.DropTableAPI(table_name);//调用api的drop table
+					cout << "you just called the drop table:" << word << endl;
+					return 1;
+				}
+				else { cout << "Syntax Error!" << endl; return 0; }
 			}
-			if(strcmp(word.c_str(),")")!=0) { cout << "Syntax Error!" << endl; return 0; }
-			//调用插入values
-			return 1;
+			else if (strcmp(word.c_str(), "index") == 0) {
+				word = get_word(command, index);
+				if (!word.empty()) {
+					index_name = word;
+					word = get_word(command, index);
+					if (strcmp(word.c_str(), "on") == 0) {
+						word = get_word(command, index);
+						table_name = word;
+					}else { cout << "Syntax Error!" << endl; return 0; }
+					api.DropIndexAPI(index_name, table_name);//调用drop index
+					cout << "you just called the drop index: " << word << endl;
+					return 1;
+				}
+				else { cout << "Syntax Error!" << endl; return 0; }
+			}
+			else { cout << "Syntax Error!" << endl; return 0; }
 		}
 		else if (strcmp(word.c_str(), "quit") == 0)return quit;
 		else if (strcmp(word.c_str(), "commit") == 0)return 1;

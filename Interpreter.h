@@ -1,9 +1,13 @@
 #pragma once
-#include<string>
+
+#include"all.h"
 #include<iostream>
 using namespace std;
-#define HELLO "hello, user"
+#define HELLO "Welcome to your database!"
+
 #define ENTER "->"
+
+#define QUIT "thx for using, hoping back!"
 class Interpreter
 {
 public:
