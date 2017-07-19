@@ -4,8 +4,10 @@
 #include<string>
 #include<sstream>
 using namespace std;
+
 //if input is wrong, we return 0, else we call the funcation from api and return 1
 extern API api;
+
 int op_for_sure(string word,int &op) {
 	if (strcmp(word.c_str(), "<") == 0)op = LESS;
 	else if (strcmp(word.c_str(), ">") == 0)op = MORE;
@@ -366,6 +368,7 @@ int Interpreter::interpreter(string command) {
 		}
 		else if (strcmp(word.c_str(), "drop") == 0)
 		{
+
 			string index_name = "";
 			string table_name = "";
 			word = get_word(command, index);
@@ -379,7 +382,9 @@ int Interpreter::interpreter(string command) {
 				else { cout << "Syntax Error!" << endl; return 0; }
 			}
 			else if (strcmp(word.c_str(), "index") == 0) {
+
 				word = get_word(command, index);
+
 				if (!word.empty()) {
 					index_name = word;
 					word = get_word(command, index);
@@ -392,8 +397,11 @@ int Interpreter::interpreter(string command) {
 					return 1;
 				}
 				else { cout << "Syntax Error!" << endl; return 0; }
+
 			}
+
 			else { cout << "Syntax Error!" << endl; return 0; }
+
 		}
 		else if (strcmp(word.c_str(), "quit") == 0)return quit;
 		else if (strcmp(word.c_str(), "commit") == 0)return 1;

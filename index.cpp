@@ -1,3 +1,4 @@
+
 #include"stdafx.h"
 #include"index.h"
 extern BufferManager BM;

@@ -1,3 +1,4 @@
+
 #pragma once//块头信息需要有一个量来表示它是根还是叶子结点
 #include"all.h"
 #define maxblock 128
